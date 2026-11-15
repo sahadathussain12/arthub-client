@@ -1,144 +1,194 @@
 "use client";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { FaBars, FaTimes, FaUserCircle, FaChevronDown } from "react-icons/fa";
+import { FiMenu, FiX, FiChevronDown, FiShoppingBag, FiArrowUpRight } from "react-icons/fi";
 
-const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const navLinks = [
+  { name: "Home", href: "/" },
+  { name: "Browse Artworks", href: "/artworks" },
+  { name: "Artists", href: "/artists" },
+];
+
+export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const pathname = usePathname();
 
   const isActive = (path) => pathname === path;
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          {/* Logo / Site Name */}
-          <div className="flex items-center">
-            <Link href="/" className="text-2xl font-bold text-indigo-600 tracking-wider">
-              Art<span className="text-gray-800">Hub</span>
-            </Link>
+    <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-[#080714]/90 text-white shadow-lg shadow-black/10 backdrop-blur-xl">
+      <nav className="mx-auto flex h-[76px] max-w-[1440px] items-center justify-between px-5 sm:px-8 lg:px-12">
+        
+        {/* Logo / Site Name */}
+        <Link href="/" className="group flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-violet-800 shadow-lg shadow-purple-500/25 transition duration-300 group-hover:rotate-6 group-hover:scale-105">
+            <FiShoppingBag className="text-xl text-white" />
           </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">
+              Art<span className="text-purple-400">Hub</span>
+              <span className="text-purple-400">.</span>
+            </h1>
+            <p className="text-[9px] font-medium uppercase tracking-[3px] text-gray-400">
+              Discover Original Art
+            </p>
+          </div>
+        </Link>
 
-          {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center space-x-8">
+        {/* Desktop Navigation Links */}
+        <div className="hidden items-center gap-8 lg:flex">
+          {navLinks.map((link) => (
             <Link
-              href="/"
-              className={`font-medium transition-colors ${
-                isActive("/") ? "text-indigo-600 font-semibold" : "text-gray-600 hover:text-indigo-600"
+              key={link.name}
+              href={link.href}
+              className={`relative py-2 text-sm font-medium transition duration-300 ${
+                isActive(link.href) ? "text-purple-400 font-semibold" : "text-gray-300 hover:text-purple-400"
               }`}
             >
-              Home
+              {link.name}
+              <span
+                className={`absolute bottom-0 left-0 h-[2px] rounded-full bg-purple-500 transition-all duration-300 ${
+                  isActive(link.href) ? "w-full" : "w-0 hover:w-full"
+                }`}
+              />
             </Link>
-            <Link
-              href="/artworks"
-              className={`font-medium transition-colors ${
-                isActive("/artworks") ? "text-indigo-600 font-semibold" : "text-gray-600 hover:text-indigo-600"
-              }`}
-            >
-              Browse Artworks
-            </Link>
+          ))}
 
-            {/* Dashboard Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="flex items-center space-x-1 text-gray-600 hover:text-indigo-600 font-medium focus:outline-none"
-              >
-                <span>Dashboard</span>
-                <FaChevronDown className="text-xs" />
-              </button>
-              {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-md shadow-lg py-1 z-50">
-                  <Link
-                    href="/dashboard/user"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    User Dashboard
-                  </Link>
-                  <Link
-                    href="/dashboard/artist"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Artist Dashboard
-                  </Link>
-                  <Link
-                    href="/dashboard/admin"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Admin Dashboard
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Login / Auth */}
-            <Link
-              href="/login"
-              className="flex items-center space-x-2 bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition"
-            >
-              <FaUserCircle className="text-lg" />
-              <span>Login</span>
-            </Link>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="flex md:hidden items-center">
+          {/* Dashboard Dropdown */}
+          <div className="relative">
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-600 hover:text-gray-900 focus:outline-none text-2xl"
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="flex items-center gap-1.5 py-2 text-sm font-medium text-gray-300 transition hover:text-purple-400 focus:outline-none"
             >
-              {isOpen ? <FaTimes /> : <FaBars />}
+              <span>Dashboard</span>
+              <FiChevronDown className={`text-xs transition-transform duration-300 ${dropdownOpen ? "rotate-180" : ""}`} />
             </button>
+
+            {dropdownOpen && (
+              <div className="absolute right-0 mt-3 w-52 rounded-2xl border border-white/10 bg-[#0D0B1B] p-2 shadow-2xl shadow-black/50 backdrop-blur-2xl z-50">
+                <Link
+                  href="/dashboard/user"
+                  onClick={() => setDropdownOpen(false)}
+                  className="block rounded-xl px-4 py-2.5 text-xs font-semibold text-gray-300 transition hover:bg-purple-500/15 hover:text-purple-300"
+                >
+                  User Dashboard
+                </Link>
+                <Link
+                  href="/dashboard/artist"
+                  onClick={() => setDropdownOpen(false)}
+                  className="block rounded-xl px-4 py-2.5 text-xs font-semibold text-gray-300 transition hover:bg-purple-500/15 hover:text-purple-300"
+                >
+                  Artist Dashboard
+                </Link>
+                <Link
+                  href="/dashboard/admin"
+                  onClick={() => setDropdownOpen(false)}
+                  className="block rounded-xl px-4 py-2.5 text-xs font-semibold text-gray-300 transition hover:bg-purple-500/15 hover:text-purple-300"
+                >
+                  Admin Dashboard
+                </Link>
+              </div>
+            )}
           </div>
         </div>
-      </div>
 
-      {/* Mobile Menu Links */}
-      {isOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 px-4 pt-2 pb-4 space-y-3">
+        {/* Desktop Actions */}
+        <div className="hidden items-center gap-5 lg:flex">
           <Link
-            href="/"
-            onClick={() => setIsOpen(false)}
-            className={`block font-medium py-2 ${isActive("/") ? "text-indigo-600" : "text-gray-600"}`}
+            href="/login"
+            className="text-sm font-semibold text-gray-300 transition hover:text-white"
           >
-            Home
+            Sign In
           </Link>
+
           <Link
-            href="/artworks"
-            onClick={() => setIsOpen(false)}
-            className={`block font-medium py-2 ${isActive("/artworks") ? "text-indigo-600" : "text-gray-600"}`}
+            href="/register"
+            className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-purple-600 to-violet-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-purple-500/20 transition duration-300 hover:-translate-y-0.5 hover:from-purple-500 hover:to-violet-500 hover:shadow-purple-500/40"
           >
-            Browse Artworks
+            Get Started
+            <FiArrowUpRight className="transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
           </Link>
-          <div className="py-2 border-t border-gray-100">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Dashboards</p>
-            <Link href="/dashboard/user" onClick={() => setIsOpen(false)} className="block py-1 text-sm text-gray-600 hover:text-indigo-600">
+        </div>
+
+        {/* Mobile Menu Button */}
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={menuOpen}
+          className="flex h-11 w-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white transition hover:border-purple-500/40 hover:bg-purple-500/10 lg:hidden"
+        >
+          {menuOpen ? <FiX size={23} /> : <FiMenu size={23} />}
+        </button>
+      </nav>
+
+      {/* Mobile Menu */}
+      <div
+        className={`overflow-hidden border-t border-white/10 bg-[#0D0B1B] transition-all duration-300 lg:hidden ${
+          menuOpen ? "max-h-[500px] opacity-100" : "max-h-0 border-transparent opacity-0"
+        }`}
+      >
+        <div className="space-y-2 px-5 py-5 sm:px-8">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
+              className={`block rounded-xl px-4 py-3 text-sm font-medium transition ${
+                isActive(link.href) ? "bg-purple-500/20 text-purple-400 font-semibold" : "text-gray-300 hover:bg-purple-500/10 hover:text-purple-400"
+              }`}
+            >
+              {link.name}
+            </Link>
+          ))}
+
+          {/* Mobile Dashboards Links */}
+          <div className="border-t border-white/10 pt-3 mt-3">
+            <p className="px-4 text-[10px] font-bold uppercase tracking-wider text-purple-400 mb-1">Dashboards</p>
+            <Link
+              href="/dashboard/user"
+              onClick={() => setMenuOpen(false)}
+              className="block rounded-xl px-4 py-2.5 text-xs font-medium text-gray-300 transition hover:bg-purple-500/10 hover:text-purple-400"
+            >
               User Dashboard
             </Link>
-            <Link href="/dashboard/artist" onClick={() => setIsOpen(false)} className="block py-1 text-sm text-gray-600 hover:text-indigo-600">
+            <Link
+              href="/dashboard/artist"
+              onClick={() => setMenuOpen(false)}
+              className="block rounded-xl px-4 py-2.5 text-xs font-medium text-gray-300 transition hover:bg-purple-500/10 hover:text-purple-400"
+            >
               Artist Dashboard
             </Link>
-            <Link href="/dashboard/admin" onClick={() => setIsOpen(false)} className="block py-1 text-sm text-gray-600 hover:text-indigo-600">
+            <Link
+              href="/dashboard/admin"
+              onClick={() => setMenuOpen(false)}
+              className="block rounded-xl px-4 py-2.5 text-xs font-medium text-gray-300 transition hover:bg-purple-500/10 hover:text-purple-400"
+            >
               Admin Dashboard
             </Link>
           </div>
-          <Link
-            href="/login"
-            onClick={() => setIsOpen(false)}
-            className="block text-center bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700"
-          >
-            Login
-          </Link>
-        </div>
-      )}
-    </nav>
-  );
-};
 
-export default Navbar;
+          <div className="grid grid-cols-2 gap-3 border-t border-white/10 pt-5 mt-3">
+            <Link
+              href="/login"
+              onClick={() => setMenuOpen(false)}
+              className="rounded-full border border-white/15 py-3 text-center text-sm font-semibold text-white transition hover:border-purple-500"
+            >
+              Sign In
+            </Link>
+            <Link
+              href="/register"
+              onClick={() => setMenuOpen(false)}
+              className="flex items-center justify-center gap-2 rounded-full bg-purple-600 py-3 text-sm font-semibold text-white transition hover:bg-purple-500"
+            >
+              Get Started
+              <FiArrowUpRight />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+}
