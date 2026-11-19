@@ -149,6 +149,18 @@ export default function LoginPage() {
           >
             {loading ? "Logging in..." : "Login"}
           </button>
+
+              <button
+          type="button"
+          onClick={() => authClient.signIn.social({
+            provider: "google",
+            callbackURL: "/",
+          })}
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-gray-700 py-3 font-medium text-white transition hover:border-purple-500 hover:bg-purple-500/5"
+        >
+          <span className="text-lg font-bold">G</span>
+          Continue with Google
+        </button>
         </form>
 
         {/* Register Link */}

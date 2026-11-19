@@ -18,5 +18,15 @@ export const auth = betterAuth({
             clientSecret: process.env.CLIENT_SECRET ,
         }, 
     },
+    user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "user", // ডিফল্ট হিসেবে ইউজার থাকবে
+        input: true, // ক্লায়েন্ট সাইড থেকে রোল পাঠানোর অনুমতি দেওয়ার জন্য এটি জরুরি
+      },
+    },
+  },
  
 });

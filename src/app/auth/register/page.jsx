@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -66,6 +65,7 @@ export default function RegisterPage() {
         name: name.trim(),
         email: email.trim().toLowerCase(),
         password,
+        role,
         callbackURL: "/",
       });
 
@@ -80,7 +80,6 @@ export default function RegisterPage() {
 
       router.push("/");
       router.refresh();
-
     } catch (error) {
       console.error("Register error:", error);
       toast.error("Something went wrong. Please try again.");
@@ -92,7 +91,6 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#080714] px-4 py-12">
       <div className="w-full max-w-lg rounded-2xl border border-purple-500/20 bg-[#100D20] p-6 shadow-2xl shadow-purple-900/10 sm:p-8">
-
         {/* Logo */}
         <div className="mb-7 text-center">
           <Link href="/" className="text-3xl font-bold text-white">
@@ -110,7 +108,6 @@ export default function RegisterPage() {
 
         {/* Register Form */}
         <form onSubmit={handleRegister} className="space-y-4">
-
           {/* Full Name */}
           <div>
             <label className="mb-2 block text-sm font-medium text-gray-300">
@@ -203,9 +200,7 @@ export default function RegisterPage() {
 
               <button
                 type="button"
-                onClick={() =>
-                  setShowConfirmPassword(!showConfirmPassword)
-                }
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 className="text-gray-400 hover:text-purple-400"
               >
                 {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
@@ -220,13 +215,14 @@ export default function RegisterPage() {
             </label>
 
             <div className="grid grid-cols-2 gap-3">
-
               {/* User */}
-              <label className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition ${
-                formData.role === "user"
-                  ? "border-purple-500 bg-purple-500/10"
-                  : "border-gray-700 hover:border-purple-500"
-              }`}>
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition ${
+                  formData.role === "user"
+                    ? "border-purple-500 bg-purple-500/10"
+                    : "border-gray-700 hover:border-purple-500"
+                }`}
+              >
                 <input
                   type="radio"
                   name="role"
@@ -244,11 +240,13 @@ export default function RegisterPage() {
               </label>
 
               {/* Artist */}
-              <label className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition ${
-                formData.role === "artist"
-                  ? "border-purple-500 bg-purple-500/10"
-                  : "border-gray-700 hover:border-purple-500"
-              }`}>
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition ${
+                  formData.role === "artist"
+                    ? "border-purple-500 bg-purple-500/10"
+                    : "border-gray-700 hover:border-purple-500"
+                }`}
+              >
                 <input
                   type="radio"
                   name="role"
@@ -264,7 +262,6 @@ export default function RegisterPage() {
                   <p className="text-xs text-gray-400">Sell Artwork</p>
                 </div>
               </label>
-
             </div>
           </div>
 
@@ -288,10 +285,12 @@ export default function RegisterPage() {
         {/* Google Button */}
         <button
           type="button"
-          onClick={() => authClient.signIn.social({
-            provider: "google",
-            callbackURL: "/",
-          })}
+          onClick={() =>
+            authClient.signIn.social({
+              provider: "google",
+              callbackURL: "/",
+            })
+          }
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-gray-700 py-3 font-medium text-white transition hover:border-purple-500 hover:bg-purple-500/5"
         >
           <span className="text-lg font-bold">G</span>
@@ -308,7 +307,6 @@ export default function RegisterPage() {
             Login
           </Link>
         </p>
-
       </div>
     </div>
   );
