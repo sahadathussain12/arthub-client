@@ -1,10 +1,11 @@
-import React from 'react';
+import { ProfileContent } from '@/component/ProfileContent';
+import React, { Suspense } from 'react';
 
 const page = () => {
     return (
-        <div>
-            profile
-        </div>
+      <Suspense fallback={<div className="min-h-screen bg-[#080714]" />}>
+      <ProfileContent />
+    </Suspense>
     );
 };
 
