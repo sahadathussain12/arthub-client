@@ -1,14 +1,17 @@
+
+import { Suspense } from "react";
 import DashboardSidebar from "@/component/DashboardSideber";
 
-import React from "react";
-
-const DashboardLayout = ({ children }) => {
+export default function DashboardLayout({ children }) {
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-[#0B0818]">
-      <DashboardSidebar />
-      <main className="flex-1 w-full p-4 md:p-8">{children}</main>
+    <div className="min-h-screen bg-[#080714] md:flex">
+      <Suspense fallback={<div className="w-64" />}>
+        <DashboardSidebar />
+      </Suspense>
+
+      <main className="min-w-0 flex-1 p-4 md:p-6">
+        {children}
+      </main>
     </div>
   );
-};
-
-export default DashboardLayout;
+}

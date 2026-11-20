@@ -74,3 +74,63 @@ export const GetMyArtworks = async (artistId) => {
     throw error;
   }
 };
+
+
+
+// Update Artwork
+export const GetSingleArtwork = async (id) => {
+  const res = await fetch(`${BaseURL}/api/artworks/${id}`);
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error(result.message || "Failed to fetch artwork");
+  }
+
+  return result;
+};
+
+
+
+// Update Artwork
+export const UpdateArtwork = async (id, artworkData) => {
+  const res = await fetch(`${BaseURL}/api/artworks/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      ...artworkData,
+      price: Number(artworkData.price),
+      stock: Number(artworkData.stock),
+    }),
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error(result.message || "Failed to update artwork");
+  }
+
+  return result;
+};
+
+// delete
+export const DeleteArtwork = async (id) => {
+  try {
+    const res = await fetch(`${BaseURL}/api/artworks/${id}`, {
+      method: "DELETE",
+    });
+    
+    const result = await res.json();
+    
+    if (!res.ok) {
+      throw new Error(result.message || "Failed to delete artwork");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("DeleteArtwork Error:", error);
+    throw error;
+  }
+};
