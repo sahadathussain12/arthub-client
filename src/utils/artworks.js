@@ -1,22 +1,3 @@
-// const BaseURL = process.env.NEXT_PUBLIC_API_URL;
-
-// export const CreateArtwork = async (data) => {
-//     // console.log(data,"creat artwork");
-//     const res = await fetch(`${BaseURL}/api/artworks`, {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json",
-//         },
-//         body: JSON.stringify(data),
-//     });
-
-
-//     const result = await res.json();
-
-//     return result;
-// };
-
-
 
 const BaseURL = process.env.NEXT_PUBLIC_API_URL;
 

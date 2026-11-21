@@ -1,15 +1,15 @@
-export const instant = false
+export const instant = false;
 
-import { UserSidebarContent } from '@/component/UserSidebar';
-import React, { Suspense } from 'react';
+import DashboardOverview from "@/component/DashboardOverview";
+import React, { Suspense } from "react";
+
 
 const UserDashboardPage = () => {
-    return (
-        <Suspense fallback={<div className="w-64 bg-[#100D20] min-h-screen" />}>
-      <UserSidebarContent />
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#080714]" />}>
+      <DashboardOverview />
     </Suspense>
-  
-    );
+  );
 };
 
 export default UserDashboardPage;
