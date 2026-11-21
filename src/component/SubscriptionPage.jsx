@@ -1,24 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
 import { FiAward, FiCheck, FiZap, FiLoader, FiStar } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { UserSidebarContent } from "@/component/UserSidebar";
+import {  GetUserSubscription, UpdateUserSubscription } from "@/utils/user"; // ১. ফাংশন ইমপোর্ট
 
 export default function SubscriptionPage() {
   const { data: session } = useSession();
+  const userId = session?.user?.id;
+
+  const [currentTier, setCurrentTier] = useState("Free");
   const [loadingTier, setLoadingTier] = useState(null);
 
+  // ২. পেজ লোড হলে ডাটাবেস থেকে ইউজারের বর্তমান প্ল্যান ফেচ করা
+  useEffect(() => {
+    if (!userId) return;
+    GetUserSubscription(userId)
+      .then((res) => {
+        if (res.success && res.tier) {
+          setCurrentTier(res.tier);
+        }
+      })
+      .catch((err) => console.error("Subscription fetch error:", err));
+  }, [userId]);
+
+  // ৩. বাটনে ক্লিক করলে ডাটাবেসে নতুন প্ল্যান সেভ করা
   const handleUpgrade = async (tierName) => {
+    if (!userId) {
+      toast.error("Please login first!");
+      return;
+    }
+
     try {
       setLoadingTier(tierName);
-      setTimeout(() => {
+      const res = await UpdateUserSubscription(userId, tierName);
+
+      if (res.success) {
+        setCurrentTier(tierName);
         toast.success(`Successfully subscribed to ${tierName} Tier!`);
-        setLoadingTier(null);
-      }, 1000);
+      } else {
+        throw new Error(res.message || "Failed to update subscription");
+      }
     } catch (error) {
-      toast.error("Failed to process subscription");
+      toast.error(error.message || "Failed to process subscription");
+    } finally {
       setLoadingTier(null);
     }
   };
@@ -34,11 +61,11 @@ export default function SubscriptionPage() {
           <div>
             <h1 className="text-2xl font-bold sm:text-3xl">Subscription Tier Overview</h1>
             <p className="mt-1 text-sm text-gray-400">
-              Manage your plan, check purchase limits, and upgrade to unlock more artworks.
+              Current Active Plan: <span className="text-purple-400 font-bold">{currentTier}</span> — Manage your plan and purchase limits.
             </p>
           </div>
 
-          {/* Pricing Cards Grid (3 Tiers as per requirements) */}
+          {/* Pricing Cards Grid */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 max-w-7xl">
             
             {/* 1. Free Tier */}
@@ -46,7 +73,7 @@ export default function SubscriptionPage() {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full bg-purple-500/10 text-purple-400">
-                    Current Default
+                    Default
                   </span>
                   <FiAward className="text-2xl text-purple-400" />
                 </div>
@@ -69,10 +96,16 @@ export default function SubscriptionPage() {
               </div>
 
               <button
-                disabled
-                className="mt-8 w-full py-3 rounded-xl bg-purple-500/10 text-purple-400 font-semibold text-sm cursor-not-allowed opacity-75"
+                onClick={() => handleUpgrade("Free")}
+                disabled={currentTier === "Free" || loadingTier === "Free"}
+                className={`mt-8 w-full py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 ${
+                  currentTier === "Free"
+                    ? "bg-purple-500/10 text-purple-400 cursor-not-allowed opacity-75"
+                    : "bg-purple-600 hover:bg-purple-700 text-white"
+                }`}
               >
-                Active Plan
+                {loadingTier === "Free" && <FiLoader className="animate-spin" />}
+                {currentTier === "Free" ? "Active Plan" : "Switch to Free"}
               </button>
             </div>
 
@@ -90,12 +123,12 @@ export default function SubscriptionPage() {
                   <p className="text-xs text-gray-400 mt-1">For regular art collectors.</p>
                 </div>
                 <div className="text-3xl font-extrabold text-white">
-                  $9.99 <span className="text-sm font-normal text-gray-400">/ month</span>[cite: 2]
+                  $9.99 <span className="text-sm font-normal text-gray-400">/ month</span>
                 </div>
 
                 <ul className="space-y-3 pt-4 border-t border-purple-500/10 text-sm text-gray-300">
                   <li className="flex items-center gap-2">
-                    <FiCheck className="text-blue-400" /> Max Purchases: <b>9 paintings</b>[cite: 2]
+                    <FiCheck className="text-blue-400" /> Max Purchases: <b>9 paintings</b>
                   </li>
                   <li className="flex items-center gap-2">
                     <FiCheck className="text-blue-400" /> Priority Support
@@ -105,11 +138,15 @@ export default function SubscriptionPage() {
 
               <button
                 onClick={() => handleUpgrade("Pro")}
-                disabled={loadingTier === "Pro"}
-                className="mt-8 w-full py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-sm transition shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 disabled:opacity-50"
+                disabled={currentTier === "Pro" || loadingTier === "Pro"}
+                className={`mt-8 w-full py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 ${
+                  currentTier === "Pro"
+                    ? "bg-blue-500/10 text-blue-400 cursor-not-allowed opacity-75"
+                    : "bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-600/30"
+                }`}
               >
                 {loadingTier === "Pro" && <FiLoader className="animate-spin" />}
-                Upgrade to Pro
+                {currentTier === "Pro" ? "Active Plan" : "Upgrade to Pro"}
               </button>
             </div>
 
@@ -131,12 +168,12 @@ export default function SubscriptionPage() {
                   <p className="text-xs text-gray-400 mt-1">For elite art investors & enthusiasts.</p>
                 </div>
                 <div className="text-3xl font-extrabold text-white">
-                  $19.99 <span className="text-sm font-normal text-gray-400">/ month</span>[cite: 2]
+                  $19.99 <span className="text-sm font-normal text-gray-400">/ month</span>
                 </div>
 
                 <ul className="space-y-3 pt-4 border-t border-purple-500/10 text-sm text-gray-300">
                   <li className="flex items-center gap-2">
-                    <FiCheck className="text-green-400" /> Max Purchases: <b>Unlimited</b>[cite: 2]
+                    <FiCheck className="text-green-400" /> Max Purchases: <b>Unlimited</b>
                   </li>
                   <li className="flex items-center gap-2">
                     <FiCheck className="text-green-400" /> Exclusive VIP Access & Support
@@ -146,11 +183,15 @@ export default function SubscriptionPage() {
 
               <button
                 onClick={() => handleUpgrade("Premium")}
-                disabled={loadingTier === "Premium"}
-                className="mt-8 w-full py-3 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold text-sm transition shadow-lg shadow-purple-600/30 flex items-center justify-center gap-2 disabled:opacity-50"
+                disabled={currentTier === "Premium" || loadingTier === "Premium"}
+                className={`mt-8 w-full py-3 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 ${
+                  currentTier === "Premium"
+                    ? "bg-green-500/10 text-green-400 cursor-not-allowed opacity-75"
+                    : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-600/30"
+                }`}
               >
                 {loadingTier === "Premium" && <FiLoader className="animate-spin" />}
-                Upgrade to Premium
+                {currentTier === "Premium" ? "Active Plan" : "Upgrade to Premium"}
               </button>
             </div>
 

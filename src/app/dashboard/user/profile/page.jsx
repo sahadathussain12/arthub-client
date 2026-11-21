@@ -1,10 +1,14 @@
-import React from 'react';
+import UserProfile from "@/component/UserProfile";
+import { Suspense } from "react";
+
+export const instant = false;
+
 
 const page = () => {
     return (
-        <div>
-            
-        </div>
+         <Suspense fallback={<div className="min-h-screen bg-[#080714]" />}>
+            <UserProfile/>
+           </Suspense>
     );
 };
 

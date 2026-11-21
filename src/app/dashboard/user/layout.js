@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "@/lib/auth-client";
 import { FiLoader } from "react-icons/fi";
 
+
 export default function UserDashboardLayout({ children }) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function UserDashboardLayout({ children }) {
 
   return (
     <div className="flex min-h-screen bg-[#080714]">
-      {/* ইউজার সাইডবার */}
+  
  
 
       {/* মূল পেজ কন্টেন্ট */}

@@ -23,3 +23,36 @@ export const GetBoughtArtworks = async (userId) => {
     throw error;
   }
 };
+
+
+
+export const GetUserSubscription = async (userId) => {
+  const res = await fetch(`${BaseURL}/api/user/subscription?userId=${userId}`, {
+    cache: "no-store",
+  });
+  const result = await res.json()
+  return result
+};
+
+export const UpdateUserSubscription = async (userId, tier) => {
+  const res = await fetch(`${BaseURL}/api/user/subscription`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId, tier }),
+  });
+  const result = await res.json()
+  return result
+};
+
+export const UpdateUserProfile = async (userId, name) => {
+  const res = await fetch(`${BaseURL}/api/user/profile`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ userId, name }),
+  });
+  return res.json();
+};

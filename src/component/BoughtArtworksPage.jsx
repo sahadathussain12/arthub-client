@@ -42,7 +42,7 @@ export default function BoughtArtworksPage() {
   return (
     <div className="flex min-h-screen bg-[#080714]">
       {/* বাম পাশে ইউজার সাইডবার */}
-      <UserSidebarContent/>
+     <UserSidebarContent/> 
        
 
       {/* ডান পাশে মূল গ্যালারি কন্টেন্ট */}
