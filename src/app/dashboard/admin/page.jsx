@@ -1,20 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FiLoader, FiShield } from "react-icons/fi";
+import { FiLoader, FiMenu, FiShield } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { DeleteArtworkByAdmin, GetAdminDashboardData, UpdateUserRole } from "@/utils/admin";
+
+import AdminSidebar from "@/component/admin/AdminSidebar";
 import AdminStatsCards from "@/component/admin/AdminStatsCards";
 import AdminCharts from "@/component/admin/AdminCharts";
 import ManageUsersTable from "@/component/admin/ManageUsersTable";
 import ManageArtworksTable from "@/component/admin/ManageArtworksTable";
 import TransactionsTable from "@/component/admin/TransactionsTable";
 
-
-
 export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("users");
+  const [activeTab, setActiveTab] = useState("overview");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -91,71 +92,73 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#080714] text-white p-4 sm:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-[#080714] text-white flex">
+      {/* বাম পাশের সাইডবার */}
+      <AdminSidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isOpen={sidebarOpen}
+        setIsOpen={setSidebarOpen}
+      />
+
+      {/* ডান পাশের মূল কন্টেন্ট */}
+      <div className="flex-1 flex flex-col min-w-0">
         
-        {/* হেডার */}
-        <div className="border-b border-purple-500/20 pb-5">
-          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
-            <FiShield className="text-purple-500" /> Admin Control Center
-          </h1>
-          <p className="text-sm text-gray-400 mt-1">
-            Manage your platform&apos;s users, artworks, and view financial analytics.
-          </p>
-        </div>
-
-        {/* ১. কার্ড কম্পোনেন্ট */}
-        <AdminStatsCards stats={stats} />
-
-        {/* ২. চার্ট কম্পোনেন্ট */}
-        <AdminCharts charts={charts} />
-
-        {/* ৩. ট্যাব ও টেবিল সেকশন */}
-        <div className="rounded-2xl border border-purple-500/20 bg-[#100D20] p-6 shadow-xl">
-          <div className="flex flex-wrap gap-3 border-b border-purple-500/20 pb-4 mb-6">
+        {/* টপ হেডার (মোবাইল মেনু বার + টাইটেল) */}
+        <header className="h-16 bg-[#100D20]/80 backdrop-blur-md border-b border-purple-500/20 px-4 sm:px-8 flex items-center justify-between sticky top-0 z-30">
+          <div className="flex items-center gap-3">
             <button
-              onClick={() => setActiveTab("users")}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${
-                activeTab === "users"
-                  ? "bg-purple-600 text-white"
-                  : "bg-[#080714] text-gray-400 hover:text-white"
-              }`}
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 rounded-lg bg-purple-500/10 text-purple-400 hover:bg-purple-500/20"
             >
-              Manage Users ({users.length})
+              <FiMenu className="text-xl" />
             </button>
-            <button
-              onClick={() => setActiveTab("artworks")}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${
-                activeTab === "artworks"
-                  ? "bg-purple-600 text-white"
-                  : "bg-[#080714] text-gray-400 hover:text-white"
-              }`}
-            >
-              Manage Artworks ({artworks.length})
-            </button>
-            <button
-              onClick={() => setActiveTab("transactions")}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition ${
-                activeTab === "transactions"
-                  ? "bg-purple-600 text-white"
-                  : "bg-[#080714] text-gray-400 hover:text-white"
-              }`}
-            >
-              All Transactions ({transactions.length})
-            </button>
+            <h1 className="text-lg sm:text-xl font-bold flex items-center gap-2">
+              <FiShield className="text-purple-400 hidden sm:inline" />
+              {activeTab === "overview" && "Dashboard Overview"}
+              {activeTab === "users" && `Manage Users (${users.length})`}
+              {activeTab === "artworks" && `Manage Artworks (${artworks.length})`}
+              {activeTab === "transactions" && `All Transactions (${transactions.length})`}
+            </h1>
           </div>
+          <span className="text-xs px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold">
+            Admin Panel
+          </span>
+        </header>
 
+        {/* মেইন কন্টেন্ট সেকশন */}
+        <main className="p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl w-full mx-auto">
+          
+          {/* ১. ওভারভিউ ট্যাব (কার্ড এবং চার্ট একসাথে থাকবে) */}
+          {activeTab === "overview" && (
+            <>
+              <AdminStatsCards stats={stats} />
+              <AdminCharts charts={charts} />
+            </>
+          )}
+
+          {/* ২. ইউজার ম্যানেজমেন্ট ট্যাব */}
           {activeTab === "users" && (
-            <ManageUsersTable users={users} onRoleChange={handleRoleChange} />
+            <div className="rounded-2xl border border-purple-500/20 bg-[#100D20] p-6 shadow-xl">
+              <ManageUsersTable users={users} onRoleChange={handleRoleChange} />
+            </div>
           )}
-          {activeTab === "artworks" && (
-            <ManageArtworksTable artworks={artworks} onDelete={handleDeleteArtwork} />
-          )}
-          {activeTab === "transactions" && (
-            <TransactionsTable transactions={transactions} />
-          )}
-        </div>
 
+          {/* ৩. আর্টওয়ার্ক ম্যানেজমেন্ট ট্যাব */}
+          {activeTab === "artworks" && (
+            <div className="rounded-2xl border border-purple-500/20 bg-[#100D20] p-6 shadow-xl">
+              <ManageArtworksTable artworks={artworks} onDelete={handleDeleteArtwork} />
+            </div>
+          )}
+
+          {/* ৪. ট্রানজেকশন ট্যাব */}
+          {activeTab === "transactions" && (
+            <div className="rounded-2xl border border-purple-500/20 bg-[#100D20] p-6 shadow-xl">
+              <TransactionsTable transactions={transactions} />
+            </div>
+          )}
+
+        </main>
       </div>
     </div>
   );
