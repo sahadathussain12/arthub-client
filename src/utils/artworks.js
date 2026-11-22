@@ -1,6 +1,17 @@
 
 const BaseURL = process.env.NEXT_PUBLIC_API_URL;
 
+
+export const GetHomePageData = async () => {
+  const res = await fetch(`${BaseURL}/api/home-data`, {
+    cache: "no-store",
+  });
+  const data = await res.json();
+  return data;
+};
+
+
+
 export const CreateArtwork = async (data) => {
   try {
     if (!BaseURL) {
@@ -115,3 +126,4 @@ export const DeleteArtwork = async (id) => {
     throw error;
   }
 };
+

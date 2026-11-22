@@ -678,7 +678,7 @@ function NavbarContent() {
                   </Link>
 
                   <Link
-                    href="/profile"
+                    href="/dashboard/artist/profile"
                     onClick={() => setProfileOpen(false)}
                     className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-gray-300 transition hover:bg-purple-500/10 hover:text-purple-400"
                   >
