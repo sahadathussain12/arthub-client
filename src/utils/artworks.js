@@ -10,9 +10,13 @@ export const GetHomePageData = async () => {
   return data;
 };
 
-export const GetArtworkData = async () => {
+export const GetArtworkData = async (search = "", category = "All") => {
   try {
-    const res = await fetch(`${BaseURL}/api/all/artworks`, {
+    const params = new URLSearchParams();
+    if (search) params.append("search", search);
+    if (category && category !== "All") params.append("category", category);
+
+    const res = await fetch(`${BaseURL}/api/all/artworks?${params.toString()}`, {
       cache: "no-store",
     });
     const data = await res.json();
@@ -26,6 +30,7 @@ export const GetArtworkData = async () => {
     return [];
   }
 };
+
 
 
 export const CreateArtwork = async (data) => {
