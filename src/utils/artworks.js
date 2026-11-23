@@ -32,6 +32,26 @@ export const GetArtworkData = async (search = "", category = "All") => {
 };
 
 
+  // detels page
+
+  export const GetSingleArtworkDetels = async (id) => {
+  try {
+    const res = await fetch(`${BaseURL}/api/all/artworks/${id}`, {
+      cache: "no-store",
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      return data.artwork;
+    }
+    return null;
+  } catch (error) {
+    console.error("Failed to fetch artwork details:", error);
+    return null;
+  }
+};
+
+
 
 export const CreateArtwork = async (data) => {
   try {
