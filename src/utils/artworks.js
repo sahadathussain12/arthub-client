@@ -10,6 +10,22 @@ export const GetHomePageData = async () => {
   return data;
 };
 
+export const GetArtworkData = async () => {
+  try {
+    const res = await fetch(`${BaseURL}/api/all/artworks`, {
+      cache: "no-store",
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      return data.artworks || data.data || [];
+    }
+    return [];
+  } catch (error) {
+    console.error("Failed to fetch artworks:", error);
+    return [];
+  }
+};
 
 
 export const CreateArtwork = async (data) => {
