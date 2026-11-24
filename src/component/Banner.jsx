@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   FiArrowLeft,
@@ -16,7 +17,6 @@ const slides = [
     description:
       "Explore extraordinary artworks from talented artists around the world. Find something that speaks to your soul.",
     button: "Browse Artworks",
-    secondary: "Explore Artists",
     image:
       "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=2000&q=90",
     number: "01",
@@ -27,7 +27,6 @@ const slides = [
     description:
       "Discover unique paintings, digital creations and timeless masterpieces made by passionate artists.",
     button: "Explore Collection",
-    secondary: "Meet Artists",
     image:
       "https://images.unsplash.com/photo-1577083552431-6e5fd01aa342?w=2000&q=90",
     number: "02",
@@ -38,7 +37,6 @@ const slides = [
     description:
       "Connect with independent creators and make original art a part of your everyday life.",
     button: "Discover Art",
-    secondary: "Join ArtHub",
     image:
       "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=2000&q=90",
     number: "03",
@@ -64,23 +62,27 @@ export default function Banner() {
     setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
-  // Automatic Slider - Every 2 Seconds
+  // Automatic Slider - প্রতি ৫ সেকেন্ড পর পর স্লাইড পরিবর্তন হবে
   useEffect(() => {
     if (paused) return;
 
     const interval = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
-    }, 2000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [paused]);
 
-  if (!mounted) return null; // Hydration mismatch রোধ করতে প্রথম রেন্ডারে নাল রিটার্ন করবে
+  if (!mounted) return null; // Hydration mismatch রোধ করতে
 
   const slide = slides[current];
 
   return (
-    <section className="relative w-full overflow-hidden bg-[#100E16] text-white">
+    <section 
+      className="relative w-full overflow-hidden bg-[#100E16] text-white"
+      onMouseEnter={() => setPaused(true)}  // মাউস নিলে স্লাইডার থেমে যাবে
+      onMouseLeave={() => setPaused(false)} // মাউস সরালে আবার চালু হবে
+    >
       {/* Background Image using standard img tag */}
       <div key={current} className="absolute inset-0 transition-opacity duration-1000">
         <img
@@ -119,22 +121,15 @@ export default function Banner() {
             {slide.description}
           </p>
 
-          {/* CTA Buttons */}
+          {/* CTA Button (Secondary button removed) */}
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            <a
+            <Link
               href="/artworks"
               className="group inline-flex items-center gap-3 rounded-full bg-purple-600 px-7 py-4 text-sm font-semibold transition-all duration-300 hover:-translate-y-1 hover:bg-purple-500 hover:shadow-lg hover:shadow-purple-500/30"
             >
               {slide.button}
               <FiArrowUpRight className="text-lg transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
-            </a>
-
-            <a
-              href="/artists"
-              className="inline-flex items-center gap-3 rounded-full border border-white/40 px-7 py-4 text-sm font-semibold transition-all duration-300 hover:border-white hover:bg-white hover:text-black"
-            >
-              {slide.secondary}
-            </a>
+            </Link>
           </div>
 
           {/* Artist Information */}
@@ -180,7 +175,7 @@ export default function Banner() {
       <button
         onClick={prevSlide}
         aria-label="Previous slide"
-        className="absolute left-3 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/30 text-white backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-purple-400 hover:bg-purple-600 sm:left-8 sm:h-12 sm:w-12"
+        className="absolute left-3 top-1/2 z-25 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/30 text-white backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-purple-400 hover:bg-purple-600 sm:left-8 sm:h-12 sm:w-12 cursor-pointer"
       >
         <FiArrowLeft size={22} />
       </button>
@@ -189,30 +184,30 @@ export default function Banner() {
       <button
         onClick={nextSlide}
         aria-label="Next slide"
-        className="absolute right-3 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/30 text-white backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-purple-400 hover:bg-purple-600 sm:right-8 sm:h-12 sm:w-12"
+        className="absolute right-3 top-1/2 z-25 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-black/30 text-white backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-purple-400 hover:bg-purple-600 sm:right-8 sm:h-12 sm:w-12 cursor-pointer"
       >
         <FiArrowRight size={22} />
       </button>
 
       {/* Bottom Controls */}
-      <div className="absolute bottom-8 left-5 z-20 flex items-center gap-3 sm:left-10 lg:left-16">
+      <div className="absolute bottom-8 left-5 z-25 flex items-center gap-3 sm:left-10 lg:left-16">
         {/* Pause / Play */}
         <button
           onClick={() => setPaused((prev) => !prev)}
           aria-label={paused ? "Play slider" : "Pause slider"}
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/10 backdrop-blur-md transition hover:bg-white hover:text-black"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-white/30 bg-white/10 backdrop-blur-md transition hover:bg-white hover:text-black cursor-pointer"
         >
           {paused ? <FiPlay size={17} /> : <FiPause size={17} />}
         </button>
 
         {/* Slider Dots */}
         <div className="ml-2 flex items-center gap-2">
-          {slides.map((item, index) => (
+          {slides.Item && slides.map((item, index) => (
             <button
               key={item.number}
               onClick={() => setCurrent(index)}
               aria-label={`Go to slide ${index + 1}`}
-              className={`h-2 rounded-full transition-all duration-500 ${
+              className={`h-2 rounded-full transition-all duration-500 cursor-pointer ${
                 current === index
                   ? "w-9 bg-purple-400"
                   : "w-2 bg-white/50 hover:bg-white"

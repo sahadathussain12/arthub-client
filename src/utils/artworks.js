@@ -1,6 +1,17 @@
+import { getClientToken } from "./client-token";
 
 const BaseURL = process.env.NEXT_PUBLIC_API_URL;
 
+const getAuthHeaders = async () => {
+  const token = await getClientToken();
+
+  console.log(token);
+
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+};
 
 export const GetHomePageData = async () => {
   const res = await fetch(`${BaseURL}/api/home-data`, {
@@ -16,11 +27,14 @@ export const GetArtworkData = async (search = "", category = "All") => {
     if (search) params.append("search", search);
     if (category && category !== "All") params.append("category", category);
 
-    const res = await fetch(`${BaseURL}/api/all/artworks?${params.toString()}`, {
-      cache: "no-store",
-    });
+    const res = await fetch(
+      `${BaseURL}/api/all/artworks?${params.toString()}`,
+      {
+        cache: "no-store",
+      },
+    );
     const data = await res.json();
-    
+
     if (data.success) {
       return data.artworks || data.data || [];
     }
@@ -31,10 +45,9 @@ export const GetArtworkData = async (search = "", category = "All") => {
   }
 };
 
+// detels page
 
-  // detels page
-
-  export const GetSingleArtworkDetels = async (id) => {
+export const GetSingleArtworkDetels = async (id) => {
   try {
     const res = await fetch(`${BaseURL}/api/all/artworks/${id}`, {
       cache: "no-store",
@@ -50,8 +63,6 @@ export const GetArtworkData = async (search = "", category = "All") => {
     return null;
   }
 };
-
-
 
 export const CreateArtwork = async (data) => {
   try {
@@ -74,13 +85,11 @@ export const CreateArtwork = async (data) => {
     }
 
     return result;
-
   } catch (error) {
     console.error("CreateArtwork Error:", error);
     throw error;
   }
 };
-
 
 // get
 
@@ -91,7 +100,7 @@ export const GetMyArtworks = async (artistId) => {
     }
 
     const res = await fetch(
-      `${BaseURL}/api/artworks?artistId=${encodeURIComponent(artistId)}`
+      `${BaseURL}/api/artworks?artistId=${encodeURIComponent(artistId)}`,
     );
 
     const result = await res.json();
@@ -101,16 +110,12 @@ export const GetMyArtworks = async (artistId) => {
     }
 
     return result;
-
   } catch (error) {
     console.error("GetMyArtworks Error:", error);
     throw error;
   }
 };
 
-
-
-// Update Artwork
 export const GetSingleArtwork = async (id) => {
   const res = await fetch(`${BaseURL}/api/artworks/${id}`);
 
@@ -122,8 +127,6 @@ export const GetSingleArtwork = async (id) => {
 
   return result;
 };
-
-
 
 // Update Artwork
 export const UpdateArtwork = async (id, artworkData) => {
@@ -154,17 +157,16 @@ export const DeleteArtwork = async (id) => {
     const res = await fetch(`${BaseURL}/api/artworks/${id}`, {
       method: "DELETE",
     });
-    
+
     const result = await res.json();
-    
+
     if (!res.ok) {
       throw new Error(result.message || "Failed to delete artwork");
     }
-    
+
     return result;
   } catch (error) {
     console.error("DeleteArtwork Error:", error);
     throw error;
   }
 };
-

@@ -14,6 +14,7 @@ import {
   FiUserCheck,
 } from "react-icons/fi";
 import { toast } from "react-toastify";
+import { getTokenData } from "@/utils/client-token";
 
 export default function RegisterPage() {
   const router = useRouter();

@@ -33,19 +33,25 @@ export default function ArtworkCard({ artwork }) {
             {artwork.title}
           </h3>
           <p className="text-xs text-gray-400 mt-1 truncate">
-            by <span className="text-gray-300">{artwork.artistName || "Artist"}</span>
+            by{" "}
+            <span className="text-gray-300">
+              {artwork.artistName || "Artist"}
+            </span>
           </p>
 
           <div className="mt-4 pt-3 border-t border-purple-500/15 flex items-center justify-between">
             <div>
-              <span className="text-[10px] uppercase text-gray-400 block">Price</span>
+              <span className="text-[10px] uppercase text-gray-400 block">
+                Price
+              </span>
               <span className="text-base font-extrabold text-cyan-400">
                 ${artwork.price}
               </span>
             </div>
-            <span className="h-8 w-8 rounded-full bg-purple-600/20 text-purple-400 group-hover:bg-purple-600 group-hover:text-white flex items-center justify-center transition">
-              <FiArrowUpRight />
-            </span>
+            <button className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-purple-600/10 hover:bg-purple-600 text-purple-400 hover:text-white border border-purple-500/20 hover:border-purple-600 font-medium text-sm transition-all duration-300 shadow-sm">
+              <span>View Details</span>
+              <FiArrowUpRight className="text-lg transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+            </button>
           </div>
         </div>
       </Link>

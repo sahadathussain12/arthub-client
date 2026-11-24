@@ -12,6 +12,7 @@ export default function FeaturedArtworks() {
   const [featured, setFeatured] = useState([]);
   const [loading, setLoading] = useState(true);
 
+
   useEffect(() => {
     const loadData = async () => {
       try {
