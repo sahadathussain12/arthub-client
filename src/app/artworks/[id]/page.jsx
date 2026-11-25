@@ -14,10 +14,10 @@ import {
   FiEdit,
 } from "react-icons/fi";
 import { GetSingleArtwork } from "@/utils/artworks";
-import { authClient } from "@/lib/auth-client";
-import { toast } from "react-toastify";
-import ArtworkReviews from "@/component/ArtworkReviews";
 
+import { authClient } from "@/lib/auth-client";
+import ArtworkReviews from "@/component/ArtworkReviews";
+import { handleStripePayment } from "@/utils/prement";
 
 function ArtworkDetailsContent({ params }) {
   const unwrappedParams = use(params);
@@ -27,6 +27,7 @@ function ArtworkDetailsContent({ params }) {
   const [artwork, setArtwork] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userRole, setUserRole] = useState("user");
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   // Better Auth থেকে সেশন চেক
   const { data: session, isPending } = authClient.useSession();
@@ -58,6 +59,14 @@ function ArtworkDetailsContent({ params }) {
       fetchDetails();
     }
   }, [id, session, isPending, router]);
+
+  // পেমেন্ট হ্যান্ডলার
+  const onPaymentClick = async () => {
+    if (!artwork) return;
+    setProcessingPayment(true);
+    await handleStripePayment(artwork, session);
+    setProcessingPayment(false);
+  };
 
   if (isPending || loading) {
     return (
@@ -166,10 +175,17 @@ function ArtworkDetailsContent({ params }) {
               {/* Payment / Buy Button */}
               <div className="space-y-3 pt-2 border-t border-purple-500/20">
                 <button
-                  onClick={() => toast.info("Payment gateway integration in progress!")}
-                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white font-bold text-sm shadow-lg shadow-purple-600/30 transition"
+                  onClick={onPaymentClick}
+                  disabled={processingPayment}
+                  className="w-full py-3.5 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white font-bold text-sm shadow-lg shadow-purple-600/30 transition disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  Book Now / Pay Now
+                  {processingPayment ? (
+                    <>
+                      <FiLoader className="animate-spin text-lg" /> Redirecting to Stripe...
+                    </>
+                  ) : (
+                    "Book Now / Pay Now"
+                  )}
                 </button>
               </div>
 
