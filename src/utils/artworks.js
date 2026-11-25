@@ -174,17 +174,19 @@ export const UpdateArtwork = async (id, artworkData) => {
   }
 };
 
-// Delete Artwork
 export const DeleteArtwork = async (id) => {
   try {
-    if (!BaseURL) {
-      throw new Error("Backend API URL not found!");
+   if (!id) {
+      throw new Error("Artwork ID is missing!");
     }
-    const authHeaders = await getAuthHeaders();
 
-    const res = await fetch(`${BaseURL}/api/artworks/${id}`, {
+   
+     const res = await fetch(`${BaseURL}/api/artworks/${id}`, {
       method: "DELETE",
-      headers: authHeaders,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include", // 👈 কুকি এবং সেশনের জন্য এটিই যথেষ্ট
     });
 
     const result = await res.json();
