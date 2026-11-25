@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useSession, authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -10,9 +10,7 @@ import {
   FiChevronDown,
   FiShoppingBag,
   FiArrowUpRight,
-  FiUser,
   FiLogOut,
-  FiSettings,
   FiGrid,
 } from "react-icons/fi";
 import { toast } from "react-toastify";
@@ -25,6 +23,7 @@ const navLinks = [
 function NavbarContent() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [dashboardDropdownOpen, setDashboardDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const pathname = usePathname();
@@ -33,12 +32,22 @@ function NavbarContent() {
   const { data: session } = useSession();
   const user = session?.user;
 
+  const [storedRole, setStoredRole] = useState("user");
+
+  useEffect(() => {
+    if (user?.role) {
+      setStoredRole(user.role.toLowerCase());
+    } else {
+      const roleFromStorage = localStorage.getItem("userRole") || "user";
+      setStoredRole(roleFromStorage.toLowerCase());
+    }
+  }, [user]);
+
   const isActive = (path) => pathname === path;
 
-  // ইউজারের রোল এবং সঠিক ড্যাশবোর্ড রাউট নির্ধারণ
   const avatar = user?.image;
   const userName = user?.name || "User";
-  const userRole = user?.role?.toLowerCase() || "user";
+  const userRole = (user?.role || storedRole || "user").toLowerCase();
 
   const dashboardHref =
     userRole === "artist"
@@ -58,8 +67,10 @@ function NavbarContent() {
         return;
       }
 
+      localStorage.removeItem("userRole");
       toast.success("Logout successful!");
       setProfileOpen(false);
+      setDashboardDropdownOpen(false);
       setMenuOpen(false);
 
       router.replace("/");
@@ -114,31 +125,50 @@ function NavbarContent() {
             </Link>
           ))}
 
-          {/* শুধুমাত্র ইউজারের নিজস্ব রোলের ড্যাশবোর্ড লিংক দেখাবে */}
+          {/* Dashboard Dropdown */}
           {user && (
-            <Link
-              href={dashboardHref}
-              className={`relative py-2 text-sm font-medium transition duration-300 ${
-                pathname.startsWith("/dashboard")
-                  ? "font-semibold text-purple-400"
-                  : "text-gray-300 hover:text-purple-400"
-              }`}
-            >
-              {userRole === "artist"
-                ? "Artist Dashboard"
-                : userRole === "admin"
-                ? "Admin Dashboard"
-                : "Dashboard"}
-              <span
-                className={`absolute bottom-0 left-0 h-[2px] rounded-full bg-purple-500 transition-all duration-300 ${
-                  pathname.startsWith("/dashboard") ? "w-full" : "w-0"
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setDashboardDropdownOpen(!dashboardDropdownOpen);
+                  setProfileOpen(false);
+                }}
+                className={`flex items-center gap-1.5 py-2 text-sm font-medium transition duration-300 ${
+                  pathname.startsWith("/dashboard")
+                    ? "font-semibold text-purple-400"
+                    : "text-gray-300 hover:text-purple-400"
                 }`}
-              />
-            </Link>
+              >
+                Dashboard
+                <FiChevronDown
+                  className={`text-xs transition-transform duration-200 ${
+                    dashboardDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+
+              {/* ড্যাশবোর্ড ড্রপডাউন মেনু (শুধু নির্দিষ্ট ড্যাশবোর্ড লিংকসহ) */}
+              {dashboardDropdownOpen && (
+                <div className="absolute left-0 z-50 mt-3 w-52 overflow-hidden rounded-2xl border border-white/10 bg-[#100D20] p-2 shadow-2xl shadow-black/50">
+                  <Link
+                    href={dashboardHref}
+                    onClick={() => setDashboardDropdownOpen(false)}
+                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-gray-300 transition hover:bg-purple-500/10 hover:text-purple-400"
+                  >
+                    <FiGrid />
+                    {userRole === "artist"
+                      ? "Artist Dashboard"
+                      : userRole === "admin"
+                      ? "Admin Dashboard"
+                      : "User Dashboard"}
+                  </Link>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
-        {/* Desktop Auth Actions */}
+        {/* Desktop Auth Actions & User Profile Dropdown */}
         <div className="hidden items-center gap-5 lg:flex">
           {!user ? (
             <>
@@ -160,7 +190,10 @@ function NavbarContent() {
           ) : (
             <div className="relative">
               <button
-                onClick={() => setProfileOpen(!profileOpen)}
+                onClick={() => {
+                  setProfileOpen(!profileOpen);
+                  setDashboardDropdownOpen(false);
+                }}
                 className="flex items-center gap-3 rounded-full border border-white/10 bg-white/5 py-1.5 pl-2 pr-3 transition hover:border-purple-500/50 hover:bg-purple-500/10"
               >
                 {avatar ? (
@@ -191,8 +224,9 @@ function NavbarContent() {
                 />
               </button>
 
+              {/* Profile Dropdown (শুধু লগআউট বা অন্য কিছু চাইলে রাখতে পারেন) */}
               {profileOpen && (
-                <div className="absolute right-0 z-50 mt-3 w-60 overflow-hidden rounded-2xl border border-white/10 bg-[#100D20] p-2 shadow-2xl shadow-black/50">
+                <div className="absolute right-0 z-50 mt-3 w-56 overflow-hidden rounded-2xl border border-white/10 bg-[#100D20] p-2 shadow-2xl shadow-black/50">
                   <div className="border-b border-white/10 px-4 py-3">
                     <p className="truncate text-sm font-semibold text-white">
                       {userName}
@@ -202,34 +236,10 @@ function NavbarContent() {
                     </p>
                   </div>
 
-                  <Link
-                    href={dashboardHref}
-                    onClick={() => setProfileOpen(false)}
-                    className="mt-2 flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-gray-300 transition hover:bg-purple-500/10 hover:text-purple-400"
-                  >
-                    <FiGrid />
-                    My Dashboard
-                  </Link>
-
-                  <Link
-                    href={
-                      userRole === "artist"
-                        ? "/dashboard/artist/profile"
-                        : "/profile"
-                    }
-                    onClick={() => setProfileOpen(false)}
-                    className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-gray-300 transition hover:bg-purple-500/10 hover:text-purple-400"
-                  >
-                    <FiSettings />
-                    My Profile
-                  </Link>
-
-                  <div className="my-2 border-t border-white/10" />
-
                   <button
                     onClick={handleLogout}
                     disabled={loading}
-                    className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-red-400 transition hover:bg-red-500/10 disabled:opacity-50"
+                    className="mt-2 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-red-400 transition hover:bg-red-500/10 disabled:opacity-50"
                   >
                     <FiLogOut />
                     {loading ? "Logging out..." : "Logout"}
@@ -299,11 +309,11 @@ function NavbarContent() {
             </Link>
           ))}
 
-          {/* Mobile: শুধুমাত্র নিজস্ব রোলের ড্যাশবোর্ড লিংক */}
+          {/* Mobile Dashboard Menu */}
           {user && (
             <div className="mt-3 border-t border-white/10 pt-3">
               <p className="mb-2 px-4 text-[10px] font-bold uppercase tracking-wider text-purple-400">
-                Account
+                Dashboard Menu
               </p>
 
               <Link
@@ -316,18 +326,6 @@ function NavbarContent() {
                   : userRole === "admin"
                   ? "Admin Dashboard"
                   : "User Dashboard"}
-              </Link>
-
-              <Link
-                href={
-                  userRole === "artist"
-                    ? "/dashboard/artist/profile"
-                    : "/profile"
-                }
-                onClick={() => setMenuOpen(false)}
-                className="block rounded-xl px-4 py-2.5 text-sm text-gray-300 hover:bg-purple-500/10 hover:text-purple-400"
-              >
-                My Profile
               </Link>
             </div>
           )}

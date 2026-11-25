@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
@@ -14,7 +14,6 @@ import {
   FiUserCheck,
 } from "react-icons/fi";
 import { toast } from "react-toastify";
-import { getTokenData } from "@/utils/client-token";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -22,6 +21,19 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [callbackUrl, setCallbackUrl] = useState("/");
+
+  // ইউআরএল থেকে callbackUrl ডাইনামিকালি রিড করার জন্য
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const urlRedirect = params.get("callbackUrl");
+      if (urlRedirect) {
+        setCallbackUrl(urlRedirect);
+      }
+    }
+  }, []);
+  
 
   const [formData, setFormData] = useState({
     name: "",
@@ -67,7 +79,7 @@ export default function RegisterPage() {
         email: email.trim().toLowerCase(),
         password,
         role,
-        callbackURL: "/",
+        callbackURL: callbackUrl,
       });
 
       if (error) {
@@ -75,11 +87,9 @@ export default function RegisterPage() {
         return;
       }
 
-      // Save role in user additional field only if your
-      // Better Auth schema has been configured to accept it.
       toast.success("Account created successfully!");
 
-      router.push("/");
+      router.push(callbackUrl);
       router.refresh();
     } catch (error) {
       console.error("Register error:", error);
@@ -289,7 +299,7 @@ export default function RegisterPage() {
           onClick={() =>
             authClient.signIn.social({
               provider: "google",
-              callbackURL: "/",
+              callbackURL: callbackUrl,
             })
           }
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-gray-700 py-3 font-medium text-white transition hover:border-purple-500 hover:bg-purple-500/5"

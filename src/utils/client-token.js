@@ -1,20 +1,17 @@
 import { authClient } from "@/lib/auth-client";
 
-// ১. ক্লায়েন্ট সাইড ("use client" ফাইল বা artworks.js) থেকে কল করার জন্য
 export const getClientToken = async () => {
   try {
-    const { data, error } = await authClient.token();
+    const response = await authClient.token();
     
-    if (error) {
-      console.error("Token fetch error:", error);
+    // ইউজার লগইন করা না থাকলে সাইলেন্টলি null রিটার্ন করবে, কোনো এরর থ্রো করবে না
+    if (!response || response.error) {
       return null;
     }
 
-    return data?.token || null;
-  } catch (error) {
-    console.error("Failed to get client token:", error);
+    return response.data?.token || response.data || null;
+  } catch (err) {
+    // লগআউট অবস্থায় এক্সেপশন হ্যান্ডেল করার জন্য
     return null;
   }
 };
-
- 

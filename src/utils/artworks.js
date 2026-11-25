@@ -5,13 +5,15 @@ const BaseURL = process.env.NEXT_PUBLIC_API_URL;
 const getAuthHeaders = async () => {
   const token = await getClientToken();
 
-  console.log(token);
+  console.log("Token:", token);
 
   return {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 };
+
+// ================= PUBLIC ROUTES =================
 
 export const GetHomePageData = async () => {
   const res = await fetch(`${BaseURL}/api/home-data`, {
@@ -45,8 +47,6 @@ export const GetArtworkData = async (search = "", category = "All") => {
   }
 };
 
-// detels page
-
 export const GetSingleArtworkDetels = async (id) => {
   try {
     const res = await fetch(`${BaseURL}/api/all/artworks/${id}`, {
@@ -64,17 +64,19 @@ export const GetSingleArtworkDetels = async (id) => {
   }
 };
 
+// ================= PROTECTED ROUTES =================
+
 export const CreateArtwork = async (data) => {
   try {
     if (!BaseURL) {
       throw new Error("Backend API URL not found!");
     }
 
+    const authHeaders = await getAuthHeaders();
+
     const res = await fetch(`${BaseURL}/api/artworks`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: authHeaders, // ডুপ্লিকেট headers রিমুভ করে সঠিক authHeaders দেওয়া হলো
       body: JSON.stringify(data),
     });
 
@@ -91,16 +93,18 @@ export const CreateArtwork = async (data) => {
   }
 };
 
-// get
-
 export const GetMyArtworks = async (artistId) => {
   try {
     if (!BaseURL) {
       throw new Error("Backend API URL not found!");
     }
+    const authHeaders = await getAuthHeaders();
 
     const res = await fetch(
       `${BaseURL}/api/artworks?artistId=${encodeURIComponent(artistId)}`,
+      {
+        headers: authHeaders,
+      }
     );
 
     const result = await res.json();
@@ -117,45 +121,70 @@ export const GetMyArtworks = async (artistId) => {
 };
 
 export const GetSingleArtwork = async (id) => {
-  const res = await fetch(`${BaseURL}/api/artworks/${id}`);
+  try {
+    if (!BaseURL) {
+      throw new Error("Backend API URL not found!");
+    }
+    const authHeaders = await getAuthHeaders();
+    const res = await fetch(`${BaseURL}/api/artworks/${id}`, {
+      headers: authHeaders,
+    });
 
-  const result = await res.json();
-
-  if (!res.ok) {
-    throw new Error(result.message || "Failed to fetch artwork");
+    
+    if (!res.ok) {
+      throw new Error(result.message || "Failed to fetch artwork");
+    }
+    const result = await res.json();
+    
+    return result;
+  } catch (error) {
+    console.error("GetSingleArtwork Error:", error);
+    throw error;
   }
-
-  return result;
 };
 
 // Update Artwork
 export const UpdateArtwork = async (id, artworkData) => {
-  const res = await fetch(`${BaseURL}/api/artworks/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      ...artworkData,
-      price: Number(artworkData.price),
-      stock: Number(artworkData.stock),
-    }),
-  });
+  try {
+    if (!BaseURL) {
+      throw new Error("Backend API URL not found!");
+    }
+    const authHeaders = await getAuthHeaders();
 
-  const result = await res.json();
+    const res = await fetch(`${BaseURL}/api/artworks/${id}`, {
+      method: "PATCH",
+      headers: authHeaders,
+      body: JSON.stringify({
+        ...artworkData,
+        price: Number(artworkData.price),
+        stock: Number(artworkData.stock),
+      }),
+    });
 
-  if (!res.ok) {
-    throw new Error(result.message || "Failed to update artwork");
+    const result = await res.json();
+
+    if (!res.ok) {
+      throw new Error(result.message || "Failed to update artwork");
+    }
+
+    return result;
+  } catch (error) {
+    console.error("UpdateArtwork Error:", error);
+    throw error;
   }
-
-  return result;
 };
 
-// delete
+// Delete Artwork
 export const DeleteArtwork = async (id) => {
   try {
+    if (!BaseURL) {
+      throw new Error("Backend API URL not found!");
+    }
+    const authHeaders = await getAuthHeaders();
+
     const res = await fetch(`${BaseURL}/api/artworks/${id}`, {
       method: "DELETE",
+      headers: authHeaders,
     });
 
     const result = await res.json();
