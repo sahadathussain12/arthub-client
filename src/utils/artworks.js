@@ -12,6 +12,23 @@ const getAuthHeaders = async () => {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 };
+// top artist
+export const GetTopArtistsData = async () => {
+  try {
+    const res = await fetch(`${BaseURL}/api/top-artists`, {
+      cache: "no-store", // সবসময় লেটেস্ট সেলস কাউন্ট দেখানোর জন্য
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      return data.data || [];
+    }
+    return [];
+  } catch (error) {
+    console.error("Failed to fetch top artists:", error);
+    return [];
+  }
+};
 
 // ================= PUBLIC ROUTES =================
 

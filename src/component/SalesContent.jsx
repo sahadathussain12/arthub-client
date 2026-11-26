@@ -6,6 +6,7 @@ import { FiDollarSign, FiLoader } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { GetSalesHistory } from "@/utils/sales";
 
+
  export function SalesContent() {
   const { data: session } = useSession();
   const user = session?.user;
