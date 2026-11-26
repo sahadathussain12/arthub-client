@@ -1,3 +1,4 @@
+import ArtCategoriesSection from '@/component/ArtCategoriesSection';
 import Banner from '@/component/Banner';
 import FeaturedArtworks from '@/component/home/FeaturedArtworks';
 import TopArtistsSection from '@/component/TopArtistsSection';
@@ -10,6 +11,7 @@ const HomePage = () => {
       <Banner/>
       <FeaturedArtworks/>
       <TopArtistsSection/>
+      <ArtCategoriesSection/>
     </div>
   );
 };
